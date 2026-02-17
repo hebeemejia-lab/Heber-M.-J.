@@ -28,11 +28,23 @@ function generarCVPDF() {
         // Clona la plantilla para evitar modificar el DOM original
         const clone = cvPlantilla.cloneNode(true);
         clone.style.display = 'block';
-        clone.style.position = 'absolute';
-        clone.style.left = '-9999px';
+        clone.style.position = 'fixed';
+        clone.style.top = '-9999px';
+        clone.style.left = '0';
+        clone.style.zIndex = '-1';
         document.body.appendChild(clone);
 
-        // Usa html2pdf para generar el PDF desde la plantilla
+        // Esperar a que la imagen de perfil cargue antes de generar el PDF
+        const img = clone.querySelector('img');
+        if (img && !img.complete) {
+                img.onload = () => generarPDFyRemover(clone);
+                img.onerror = () => generarPDFyRemover(clone);
+        } else {
+                setTimeout(() => generarPDFyRemover(clone), 200);
+        }
+}
+
+function generarPDFyRemover(clone) {
         html2pdf()
             .set({
                 margin: 10,
